@@ -6,11 +6,22 @@ const { ObjectId } = require("mongodb");
 const route = express.Router();
 
 route.get("/", (req, res) => {
+  const page = parseInt(req.query?.page || 0);
+  const size = parseInt(req.query?.size);
   serverError(async () => {
-    const result = await phoneColl.find().toArray();
+    const resultLength = await phoneColl.estimatedDocumentCount();
+    const result = await phoneColl
+      .find()
+      .skip(page * size)
+      .limit(size)
+      .toArray();
     const haveData = dataAvailable(result, res);
     if (haveData) {
-      res.status(200).send(result);
+      res.status(200).send({
+        totalDataCount: resultLength,
+        dataCount: result.length,
+        data: result,
+      });
     }
   }, res);
 });
