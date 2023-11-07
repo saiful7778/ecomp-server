@@ -3,9 +3,9 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
-const phonesRoute = require("./routes/phones");
-const authRoute = require("./routes/auth");
-const cartRoute = require("./routes/cart");
+const phonesRoute = require("./src/routes/phones");
+const authRoute = require("./src/routes/auth");
+const cartRoute = require("./src/routes/cart");
 
 const port = process.env.PORT || 5001;
 
