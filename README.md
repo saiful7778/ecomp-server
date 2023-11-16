@@ -1,1 +1,1 @@
-# PhoneDir - ecommerce server side
+# Ecomp - a ecommerce server side

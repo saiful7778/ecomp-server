@@ -3,7 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
-const phonesRoute = require("./src/routes/phones");
+const { phoneRoute, phonesRoute } = require("./src/routes/phones");
 const authRoute = require("./src/routes/auth");
 const cartRoute = require("./src/routes/cart");
 
@@ -23,10 +23,11 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send({
-    status: "PhoneDir server is running",
+    status: "Ecomp server is running",
   });
 });
 
+app.use("/phone", phoneRoute);
 app.use("/phones", phonesRoute);
 app.use("/auth", authRoute);
 app.use("/cart", cartRoute);
