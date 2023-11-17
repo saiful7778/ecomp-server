@@ -1,5 +1,5 @@
 const express = require("express");
-const { phoneColl, cartColl } = require("../db/mongoDB");
+const { phoneColl } = require("../db/mongoDB");
 const serverError = require("../utility/serverError");
 const { ObjectId } = require("mongodb");
 const route = express.Router();
@@ -8,15 +8,22 @@ const phonesRoute = express.Router();
 phonesRoute.get("/", async (req, res) => {
   const page = parseInt(req.query?.page || 0);
   const size = parseInt(req.query?.size);
+  const type = req.query?.type;
   const skip = page * size;
+  const query = type ? { type: type } : {};
+  const sortQuery = req.query?.sort || false;
+  const options = {
+    sort: {
+      price: sortQuery === "asc" ? 1 : -1,
+    },
+  };
   serverError(async () => {
     const count = await phoneColl.estimatedDocumentCount();
-    const result = await phoneColl.find().skip(skip).limit(size).toArray();
-    if (!result.length) {
-      return res
-        .status(204)
-        .send({ message: "not data found", success: false });
-    }
+    const result = await phoneColl
+      .find(query, sortQuery ? options : {})
+      .skip(skip)
+      .limit(size)
+      .toArray();
     res.status(200).send({
       totalResult: count,
       count: result.length,
