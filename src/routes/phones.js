@@ -6,26 +6,24 @@ const route = express.Router();
 const phonesRoute = express.Router();
 
 phonesRoute.get("/", async (req, res) => {
-  const page = parseInt(req.query?.page || 0);
-  const size = parseInt(req.query?.size);
-  const type = req.query?.type;
-  const skip = page * size;
-  const query = type ? { type: type } : {};
-  const sortQuery = req.query?.sort || false;
-  const options = {
-    sort: {
-      price: sortQuery === "asc" ? 1 : -1,
-    },
-  };
+  const { page, size, type, sort } = req.query;
+  const skip = parseInt(page || 0) * parseInt(size || 10);
   serverError(async () => {
-    const count = await phoneColl.estimatedDocumentCount();
-    const result = await phoneColl
-      .find(query, sortQuery ? options : {})
-      .skip(skip)
-      .limit(size)
-      .toArray();
+    const totalCount = await phoneColl.estimatedDocumentCount();
+    let query = phoneColl.find();
+
+    if (type) {
+      query = query.filter({ type });
+    }
+
+    if (sort === "asc") {
+      query = query.sort({ price: 1 });
+    } else if (sort === "dsc") {
+      query = query.sort({ price: -1 });
+    }
+    const result = await query.skip(skip).limit(parseInt(size)).toArray();
     res.status(200).send({
-      totalResult: count,
+      totalResult: totalCount,
       count: result.length,
       success: true,
       result,
